@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
+using MySqlConnector;
 
 namespace _2reli_api.Controllers
 {
@@ -12,13 +12,13 @@ namespace _2reli_api.Controllers
         [HttpGet]
         public async Task<IEnumerable<SellProduct>> GetUsers()
         {
-            var connectionString = "Server=108.181.197.189;Port=19793;Database=reli;Uid=root;Pwd=duyhung2004;";
-            var connecttion = new NpgsqlConnection(connectionString);
+            var connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+            var connecttion = new MySqlConnection(connectionString);
             var sql = "SELECT * FROM sell_product";
             var result = await connecttion.QueryAsync<SellProduct>(sql);
             return result;
         }
-        private readonly string _connectionString = "Server=108.181.197.189;Port=19793;Database=reli;Uid=root;Pwd=duyhung2004;";
+        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
         /// <summary>
         /// Lấy ảnh của sản phẩm theo id
         /// </summary>
@@ -27,7 +27,7 @@ namespace _2reli_api.Controllers
         [HttpGet("images/{productId}")]
         public async Task<IActionResult> GetProductImages(int productId)
         {
-            using (var connection = new NpgsqlConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 var sql = "SELECT image_data FROM product_images WHERE product_id = @ProductId";
                 var images = await connection.QueryAsync<string>(sql, new { ProductId = productId });
@@ -50,7 +50,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     var sql = "SELECT * FROM sell_product WHERE id = @ProductId";
                     var product = await connection.QueryFirstOrDefaultAsync<SellProduct>(sql, new { ProductId = productId });
@@ -79,7 +79,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     var sql = @"INSERT INTO sell_product 
                                 (product_name, product_descr, product_status, product_type, product_size, product_quantity, product_price,user_id,sell_status) 
@@ -106,7 +106,7 @@ namespace _2reli_api.Controllers
         {   
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     var sql = @"SELECT * FROM sell_product LIMIT @StartRecord, @Count";
                     var result = await connection.QueryAsync<SellProduct>(sql, new { StartRecord = startRecord, Count = count });
@@ -129,7 +129,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     var selectSql = "SELECT id FROM sell_product ORDER BY id DESC LIMIT 1;";
                     var productId = await connection.QueryFirstOrDefaultAsync<int>(selectSql);
@@ -147,39 +147,6 @@ namespace _2reli_api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error adding product image: {ex.Message}");
             }
         }
-        /// <summary>
-        /// Thêm sản phẩm vào giỏ hàng
-        /// </summary>
-        /// <param name="cart"></param>
-        /// <returns></returns>
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart(Cart cart)
-        {
-            try
-            {
-                using (var connection = new NpgsqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-
-                    var sql = @"INSERT INTO cart (user_id, product_id, quantity, product_price) 
-                                VALUES (@User_id, @Product_id, @Quantity, @Product_price)";
-                    var parameters = new
-                    {
-                        cart.User_id,
-                        cart.Product_id,
-                        cart.Quantity,
-                        cart.Product_price
-                    };
-
-                    await connection.ExecuteAsync(sql, parameters);
-
-                    return Ok("Product added to cart successfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error adding product to cart: {ex.Message}");
-            }
-        }
+        
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
+using MySqlConnector;
 
 namespace _2reli_api.Controllers
 {
@@ -12,24 +12,24 @@ namespace _2reli_api.Controllers
         [HttpGet]
         public async Task<IEnumerable<User>> GetUsers()
         {
-        var connectionString = "Server=108.181.197.189;Port=19793;Database=reli;Uid=root;Pwd=duyhung2004;";
-            var connecttion = new NpgsqlConnection(connectionString);
+        var connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+            var connecttion = new MySqlConnection(connectionString);
             var sql = "SELECT * FROM User";
             var result = await connecttion.QueryAsync<User>(sql);
             return result;
         }
-        private readonly string _connectionString = "Server=108.181.197.189;Port=19793;Database=reli;Uid=root;Pwd=duyhung2004;";
+        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
 
         [HttpPost]
         public async Task<IActionResult> AddUser(User newUser)
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
-                    var sql = @"INSERT INTO User (name, password, phone_number, nickname ) 
+                    var sql = @"INSERT INTO user (name, password, phone_number, nickname ) 
                                 VALUES (@Name, @Password, @Phone_Number, @Nickname)";
                     var parameters = new
                     {
@@ -56,11 +56,11 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
-                    var sql = "SELECT * FROM User WHERE id = @Id";
+                    var sql = "SELECT * FROM user WHERE id = @Id";
 
                     var user = await connection.QueryFirstOrDefaultAsync<User>(sql, new { Id = id });
 
@@ -82,7 +82,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
@@ -130,7 +130,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 
@@ -169,7 +169,7 @@ namespace _2reli_api.Controllers
         {
             try
             {
-                using (var connection = new NpgsqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
 

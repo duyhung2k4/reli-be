@@ -3,7 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
+using MySqlConnector;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,7 +17,7 @@ namespace _2reli_api.Controllers
     public class LoginController : Controller
     {   
         private readonly IConfiguration _configuration;
-        private readonly string _connectionString = "Server=108.181.197.189;Port=19793;Database=reli;Uid=root;Pwd=duyhung2004;";
+        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
         public class UserRes
         {
             public int id { get; set; }
@@ -41,9 +41,9 @@ namespace _2reli_api.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = false,
-                    Expires = DateTimeOffset.Now.AddDays(7), // Thời gian sống của cookie
-                    SameSite = SameSiteMode.None, // Cài đặt SameSite tùy thuộc vào yêu cầu của ứng dụng
-                    Secure = false // Đảm bảo cookie chỉ được gửi qua HTTPS
+                    Expires = DateTimeOffset.Now.AddDays(7), 
+                    SameSite = SameSiteMode.None, 
+                    Secure = false 
                 };
                 Response.Cookies.Append("userData", user.Id.ToString(), cookieOptions);
                 Response.Cookies.Append("Jwt", token, cookieOptions);
@@ -76,9 +76,9 @@ namespace _2reli_api.Controllers
         }
         private User Authenticate(UserLogin userLogin)
         {
-            using (var connection = new NpgsqlConnection(_connectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                var query = "SELECT * FROM \"user\" WHERE Nickname = @Nickname AND Password = @Password";;
+                var query = "SELECT * FROM user WHERE Nickname = @Nickname AND Password = @Password";
                 var parameters = new { Nickname = userLogin.Nickname, Password = userLogin.Password };
                 var result = connection.QueryFirstOrDefault<User>(query, parameters);
                 if (result != null) return result;
