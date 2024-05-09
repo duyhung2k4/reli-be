@@ -12,13 +12,13 @@ namespace _2reli_api.Controllers
         [HttpGet]
         public async Task<IEnumerable<SellProduct>> GetUsers()
         {
-            var connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+            var connectionString = "Server=srv515925;Port=3306;Database=2reli_database;Uid=root;Pwd=ubuntu123;";
             var connecttion = new MySqlConnection(connectionString);
-            var sql = "SELECT * FROM sell_product";
+            var sql = "SELECT * FROM sell_product ORDER BY id DESC";
             var result = await connecttion.QueryAsync<SellProduct>(sql);
             return result;
         }
-        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+        private readonly string _connectionString = "Server=srv515925;Port=3306;Database=2reli_database;Uid=root;Pwd=ubuntu123;";
         /// <summary>
         /// Lấy ảnh của sản phẩm theo id
         /// </summary>
@@ -38,6 +38,34 @@ namespace _2reli_api.Controllers
                 }
 
                 return Ok(images);
+            }
+        }
+        /// <summary>
+        /// Lấy ảnh đầu tiên của sản phẩm theo id
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        [HttpGet("imagesThumbnail/{productId}")]
+        public async Task<IActionResult> GetProductFirstImage(int productId)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    var sql = "SELECT image_data FROM product_images WHERE product_id = @ProductId LIMIT 1";
+                    var image = await connection.QueryFirstOrDefaultAsync<string>(sql, new { ProductId = productId });
+
+                    if (image == null)
+                    {
+                        return NotFound();
+                    }
+
+                    return Ok(image);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error fetching product image: {ex.Message}");
             }
         }
         /// <summary>
@@ -101,15 +129,15 @@ namespace _2reli_api.Controllers
         /// <param thứ tự bản ghi="startRecord"></param>
         /// <param số bản ghi="count"></param>
         /// <returns></returns>
-        [HttpGet("{startRecord}/{count}")]
-        public async Task<IActionResult> GetProducts(int startRecord, int count)
-        {   
+        [HttpGet("demoproduct/{count}")]
+        public async Task<IActionResult> GetProducts(int count)
+        {
             try
             {
                 using (var connection = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"SELECT * FROM sell_product LIMIT @StartRecord, @Count";
-                    var result = await connection.QueryAsync<SellProduct>(sql, new { StartRecord = startRecord, Count = count });
+                    var sql = @"SELECT * FROM sell_product ORDER BY id DESC LIMIT @Count";
+                    var result = await connection.QueryAsync<SellProduct>(sql, new { Count = count });
 
                     return Ok(result);
                 }
@@ -119,6 +147,7 @@ namespace _2reli_api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error fetching products: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Thêm ảnh vào khi post sản phẩm
         /// </summary>

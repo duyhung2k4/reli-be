@@ -12,13 +12,13 @@ namespace _2reli_api.Controllers
         [HttpGet]
         public async Task<IEnumerable<User>> GetUsers()
         {
-        var connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+        var connectionString = "Server=srv515925;Port=3306;Database=2reli_database;Uid=root;Pwd=ubuntu123;";
             var connecttion = new MySqlConnection(connectionString);
             var sql = "SELECT * FROM User";
             var result = await connecttion.QueryAsync<User>(sql);
             return result;
         }
-        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+        private readonly string _connectionString = "Server=srv515925;Port=3306;Database=2reli_database;Uid=root;Pwd=ubuntu123;";
 
         [HttpPost]
         public async Task<IActionResult> AddUser(User newUser)
@@ -29,7 +29,7 @@ namespace _2reli_api.Controllers
                 {
                     await connection.OpenAsync();
 
-                    var sql = @"INSERT INTO user (name, password, phone_number, nickname ) 
+                    var sql = @"INSERT INTO User (name, password, phone_number, nickname ) 
                                 VALUES (@Name, @Password, @Phone_Number, @Nickname)";
                     var parameters = new
                     {
@@ -60,7 +60,7 @@ namespace _2reli_api.Controllers
                 {
                     await connection.OpenAsync();
 
-                    var sql = "SELECT * FROM user WHERE id = @Id";
+                    var sql = "SELECT * FROM User WHERE id = @Id";
 
                     var user = await connection.QueryFirstOrDefaultAsync<User>(sql, new { Id = id });
 

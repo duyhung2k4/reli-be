@@ -9,7 +9,7 @@ namespace _2reli_api.Controllers
     [ApiController]
     public class BuyOrderController : ControllerBase
     {
-        private readonly string _connectionString = "Server=mysql-170726-0.cloudclusters.net;Port=15658;Database=2reli_database;Uid=admin;Pwd=hN8U2cQv;";
+        private readonly string _connectionString = "Server=srv515925;Port=3306;Database=2reli_database;Uid=root;Pwd=ubuntu123;";
 
         [HttpPost] // Đánh dấu phương thức là HTTP POST
         public async Task<IActionResult> AddToBuyOderList(BuyOrderItem buyOrderItem) // Chỉnh sửa kiểu trả về và tham số
